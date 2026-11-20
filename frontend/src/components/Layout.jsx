@@ -1,5 +1,5 @@
 import { Outlet, NavLink } from 'react-router-dom'
-import { Home, Search, Heart } from 'lucide-react'
+import { Home, Search, Heart, LogOut } from 'lucide-react'
 
 const navItems = [
   { to: '/home', icon: Home, label: 'Home' },
@@ -7,17 +7,14 @@ const navItems = [
   { to: '/matches', icon: Heart, label: 'Matches' },
 ]
 
-export default function Layout() {
+export default function Layout({ user, onLogout }) {
   return (
     <div style={styles.root}>
-      {/* Main content */}
       <main style={styles.main}>
         <Outlet />
       </main>
 
-      {/* Right vertical navbar */}
       <nav style={styles.nav}>
-        {/* Logo */}
         <div style={styles.logo}>
           <span style={styles.logoText}>C</span>
         </div>
@@ -40,10 +37,15 @@ export default function Layout() {
           ))}
         </div>
 
-        {/* Avatar */}
-        <div style={styles.avatar}>
-          <img src="https://i.pravatar.cc/300?img=1" alt="You" style={styles.avatarImg} />
-          <div style={styles.avatarRing} />
+        <div style={styles.bottomSection}>
+          <div style={styles.avatar}>
+            <img src="https://i.pravatar.cc/300?img=1" alt={user?.name} style={styles.avatarImg} />
+            <div style={styles.avatarRing} />
+          </div>
+          <span style={styles.userName}>{user?.name?.split(' ')[0]}</span>
+          <button onClick={onLogout} style={styles.logoutBtn} title="Sign out">
+            <LogOut size={15} />
+          </button>
         </div>
       </nav>
     </div>
@@ -132,6 +134,12 @@ const styles = {
     letterSpacing: '0.05em',
     textTransform: 'uppercase',
   },
+  bottomSection: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 8,
+  },
   avatar: {
     position: 'relative',
     width: 48,
@@ -150,5 +158,29 @@ const styles = {
     borderRadius: '50%',
     border: '1px solid rgba(201,168,76,0.4)',
     pointerEvents: 'none',
+  },
+  userName: {
+    color: 'var(--text-muted)',
+    fontSize: '0.6rem',
+    fontWeight: 500,
+    letterSpacing: '0.05em',
+    textTransform: 'uppercase',
+    maxWidth: 72,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    textAlign: 'center',
+  },
+  logoutBtn: {
+    background: 'transparent',
+    border: '1px solid var(--border)',
+    borderRadius: 8,
+    color: 'var(--text-muted)',
+    padding: '6px 8px',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'color 0.2s, border-color 0.2s',
   },
 }
