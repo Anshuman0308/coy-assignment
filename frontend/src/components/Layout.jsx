@@ -1,186 +1,67 @@
 import { Outlet, NavLink } from 'react-router-dom'
-import { Home, Search, Heart, LogOut } from 'lucide-react'
+import { Home, Compass, Heart } from 'lucide-react'
 
-const navItems = [
-  { to: '/home', icon: Home, label: 'Home' },
-  { to: '/search', icon: Search, label: 'Search' },
+const tabs = [
+  { to: '/home', icon: Home, label: 'Discover' },
+  { to: '/search', icon: Compass, label: 'Explore' },
   { to: '/matches', icon: Heart, label: 'Matches' },
 ]
 
 export default function Layout({ user, onLogout }) {
   return (
-    <div style={styles.root}>
-      <main style={styles.main}>
+    <div style={s.root}>
+      {/* Top bar */}
+      <header style={s.header}>
+        <span style={s.logo}>coy</span>
+        <button onClick={onLogout} style={s.logoutBtn}>
+          <img src={user?.photo || 'https://i.pravatar.cc/300?img=1'} alt="" style={s.avatar} />
+        </button>
+      </header>
+
+      {/* Page content */}
+      <main style={s.main}>
         <Outlet />
       </main>
 
-      <nav style={styles.nav}>
-        <div style={styles.logo}>
-          <span style={styles.logoText}>C</span>
-        </div>
-
-        <div style={styles.navLinks}>
-          {navItems.map(({ to, icon: Icon, label }) => (
-            <NavLink key={to} to={to} style={({ isActive }) => ({
-              ...styles.navItem,
-              ...(isActive ? styles.navItemActive : {})
-            })}>
-              {({ isActive }) => (
-                <>
-                  <div style={{ ...styles.iconWrap, ...(isActive ? styles.iconWrapActive : {}) }}>
-                    <Icon size={20} strokeWidth={isActive ? 2 : 1.5} />
-                  </div>
-                  <span style={styles.navLabel}>{label}</span>
-                </>
-              )}
-            </NavLink>
-          ))}
-        </div>
-
-        <div style={styles.bottomSection}>
-          <div style={styles.avatar}>
-            <img src="https://i.pravatar.cc/300?img=1" alt={user?.name} style={styles.avatarImg} />
-            <div style={styles.avatarRing} />
-          </div>
-          <span style={styles.userName}>{user?.name?.split(' ')[0]}</span>
-          <button onClick={onLogout} style={styles.logoutBtn} title="Sign out">
-            <LogOut size={15} />
-          </button>
-        </div>
+      {/* Bottom tab bar */}
+      <nav style={s.nav}>
+        {tabs.map(({ to, icon: Icon, label }) => (
+          <NavLink key={to} to={to} style={{ textDecoration: 'none', flex: 1 }}>
+            {({ isActive }) => (
+              <div style={{ ...s.tab, color: isActive ? 'var(--rose)' : 'var(--text-3)' }}>
+                <div style={{ ...s.tabIcon, background: isActive ? 'var(--rose-light)' : 'transparent' }}>
+                  <Icon size={22} strokeWidth={isActive ? 2.2 : 1.8} />
+                </div>
+                <span style={{ ...s.tabLabel, fontWeight: isActive ? 600 : 400 }}>{label}</span>
+              </div>
+            )}
+          </NavLink>
+        ))}
       </nav>
     </div>
   )
 }
 
-const styles = {
-  root: {
-    display: 'flex',
-    height: '100vh',
-    width: '100vw',
-    background: 'var(--navy)',
-    overflow: 'hidden',
-  },
-  main: {
-    flex: 1,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  nav: {
-    width: 88,
-    background: 'var(--navy-mid)',
-    borderLeft: '1px solid var(--border)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '24px 0',
-    flexShrink: 0,
-    zIndex: 10,
+const s = {
+  root: { display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg)', overflow: 'hidden' },
+  header: {
+    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+    padding: '0 20px', height: 56, background: 'var(--surface)',
+    borderBottom: '1px solid var(--border)', flexShrink: 0, zIndex: 10,
   },
   logo: {
-    width: 48,
-    height: 48,
-    borderRadius: '50%',
-    background: 'linear-gradient(135deg, var(--gold-dark), var(--gold))',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '0 0 20px rgba(201,168,76,0.4)',
+    fontSize: '1.6rem', fontWeight: 700, color: 'var(--rose)',
+    letterSpacing: '-0.04em', fontStyle: 'italic', fontFamily: 'Georgia, serif',
   },
-  logoText: {
-    fontFamily: 'Cormorant Garamond, serif',
-    fontSize: '1.6rem',
-    fontWeight: 700,
-    color: '#fff',
-    lineHeight: 1,
+  logoutBtn: { background: 'none', border: 'none', padding: 0, cursor: 'pointer' },
+  avatar: { width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--rose-light)' },
+  main: { flex: 1, overflow: 'hidden', position: 'relative' },
+  nav: {
+    display: 'flex', height: 'var(--nav-h)',
+    background: 'var(--surface)', borderTop: '1px solid var(--border)',
+    flexShrink: 0, zIndex: 10,
   },
-  navLinks: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 8,
-    alignItems: 'center',
-  },
-  navItem: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 4,
-    padding: '12px 0',
-    width: 72,
-    borderRadius: 12,
-    color: 'var(--text-muted)',
-    textDecoration: 'none',
-    transition: 'all 0.2s',
-  },
-  navItemActive: {
-    color: 'var(--gold)',
-  },
-  iconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'all 0.2s',
-  },
-  iconWrapActive: {
-    background: 'rgba(201,168,76,0.12)',
-    boxShadow: '0 0 12px rgba(201,168,76,0.2)',
-  },
-  navLabel: {
-    fontSize: '0.62rem',
-    fontWeight: 500,
-    letterSpacing: '0.05em',
-    textTransform: 'uppercase',
-  },
-  bottomSection: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 8,
-  },
-  avatar: {
-    position: 'relative',
-    width: 48,
-    height: 48,
-  },
-  avatarImg: {
-    width: 48,
-    height: 48,
-    borderRadius: '50%',
-    objectFit: 'cover',
-    border: '2px solid var(--gold)',
-  },
-  avatarRing: {
-    position: 'absolute',
-    inset: -3,
-    borderRadius: '50%',
-    border: '1px solid rgba(201,168,76,0.4)',
-    pointerEvents: 'none',
-  },
-  userName: {
-    color: 'var(--text-muted)',
-    fontSize: '0.6rem',
-    fontWeight: 500,
-    letterSpacing: '0.05em',
-    textTransform: 'uppercase',
-    maxWidth: 72,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-    textAlign: 'center',
-  },
-  logoutBtn: {
-    background: 'transparent',
-    border: '1px solid var(--border)',
-    borderRadius: 8,
-    color: 'var(--text-muted)',
-    padding: '6px 8px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'color 0.2s, border-color 0.2s',
-  },
+  tab: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, padding: '8px 0' },
+  tabIcon: { width: 44, height: 36, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' },
+  tabLabel: { fontSize: '0.68rem', letterSpacing: '0.01em' },
 }

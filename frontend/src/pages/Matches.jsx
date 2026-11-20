@@ -1,82 +1,61 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Heart, MapPin, Sparkles } from 'lucide-react'
+import { MapPin, MessageCircle } from 'lucide-react'
 
 export default function Matches() {
   const [matches, setMatches] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/matches')
-      .then(r => r.json())
-      .then(data => { setMatches(data); setLoading(false) })
+    fetch('/api/matches').then(r => r.json()).then(d => { setMatches(d); setLoading(false) })
   }, [])
 
   return (
-    <div style={styles.root}>
-      <div style={styles.header}>
-        <div>
-          <h1 style={styles.title}>Matches</h1>
-          <p style={styles.subtitle}>Your mutual connections</p>
-        </div>
-        {matches.length > 0 && (
-          <div style={styles.badge}>
-            <Heart size={13} fill="var(--gold)" color="var(--gold)" />
-            <span style={styles.badgeText}>{matches.length}</span>
-          </div>
-        )}
+    <div style={s.root}>
+      <div style={s.header}>
+        <h1 style={s.title}>Matches</h1>
+        {matches.length > 0 && <span style={s.badge}>{matches.length}</span>}
       </div>
 
       {loading ? (
-        <div style={styles.center}>
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ repeat: Infinity, duration: 1.2, ease: 'linear' }}
-            style={styles.spinner}
-          />
+        <div style={s.center}>
+          <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+            style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid var(--border)', borderTopColor: 'var(--rose)' }} />
         </div>
       ) : matches.length === 0 ? (
-        <EmptyMatches />
+        <Empty />
       ) : (
-        <div style={styles.list}>
+        <div style={s.list}>
           {matches.map((m, i) => (
             <motion.div
               key={m.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.06 }}
-              style={styles.card}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              style={s.card}
             >
-              {/* Gold top accent */}
-              <div style={styles.cardAccent} />
-
-              <div style={styles.avatarWrap}>
-                <img src={m.photo} alt={m.name} style={styles.avatar} />
-                <div style={styles.avatarRing} />
-                <div style={styles.heartBadge}>💘</div>
+              <div style={s.photoWrap}>
+                <img src={m.photo} alt={m.name} style={s.photo} />
+                <div style={s.onlineDot} />
               </div>
-
-              <div style={styles.info}>
-                <div style={styles.nameRow}>
-                  <h3 style={styles.name}>{m.name}</h3>
-                  <span style={styles.age}>{m.age}</span>
+              <div style={s.info}>
+                <div style={s.nameRow}>
+                  <span style={s.name}>{m.name}, {m.age}</span>
                 </div>
-                <div style={styles.cityRow}>
-                  <MapPin size={12} color="var(--gold)" />
-                  <span style={styles.city}>{m.city}</span>
+                <div style={s.cityRow}>
+                  <MapPin size={12} color="var(--text-3)" />
+                  <span style={s.city}>{m.city}</span>
                 </div>
-                <p style={styles.bio}>{m.bio}</p>
-                <div style={styles.tags}>
-                  {m.interests.split(',').slice(0, 3).map(t => (
-                    <span key={t} style={styles.tag}>{t.trim()}</span>
+                <p style={s.bio}>{m.bio}</p>
+                <div style={s.tags}>
+                  {m.interests.split(',').slice(0, 2).map(t => (
+                    <span key={t} style={s.tag}>{t.trim()}</span>
                   ))}
                 </div>
               </div>
-
-              <div style={styles.matchedLabel}>
-                <Sparkles size={11} color="var(--gold)" />
-                <span>Matched</span>
-              </div>
+              <button style={s.msgBtn}>
+                <MessageCircle size={20} color="var(--rose)" strokeWidth={1.8} />
+              </button>
             </motion.div>
           ))}
         </div>
@@ -85,173 +64,47 @@ export default function Matches() {
   )
 }
 
-function EmptyMatches() {
+function Empty() {
   return (
-    <div style={styles.center}>
-      <motion.div
-        animate={{ scale: [1, 1.1, 1] }}
-        transition={{ repeat: Infinity, duration: 2 }}
-        style={{ fontSize: '3.5rem', marginBottom: 16 }}
-      >
-        💘
-      </motion.div>
-      <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.8rem', color: 'var(--gold)', marginBottom: 8 }}>
-        No matches yet
-      </h2>
-      <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', textAlign: 'center', lineHeight: 1.6 }}>
-        Keep swiping to find<br />your perfect match
-      </p>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 40, textAlign: 'center' }}>
+      <motion.div animate={{ scale: [1, 1.08, 1] }} transition={{ repeat: Infinity, duration: 2 }} style={{ fontSize: '3rem', marginBottom: 16 }}>💘</motion.div>
+      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--text)', marginBottom: 8 }}>No matches yet</h2>
+      <p style={{ fontSize: '0.88rem', color: 'var(--text-2)', lineHeight: 1.6 }}>Keep swiping to find<br />your perfect match</p>
     </div>
   )
 }
 
-const styles = {
-  root: {
-    height: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '28px 32px 0',
-    background: 'var(--navy)',
-    overflow: 'hidden',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 24,
-    flexShrink: 0,
-  },
-  title: {
-    fontFamily: 'Cormorant Garamond, serif',
-    fontSize: '2.4rem',
-    fontWeight: 600,
-    color: 'var(--cream)',
-    lineHeight: 1,
-  },
-  subtitle: { color: 'var(--text-muted)', fontSize: '0.82rem', marginTop: 4, letterSpacing: '0.05em' },
+const s = {
+  root: { height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', overflow: 'hidden' },
+  header: { display: 'flex', alignItems: 'center', gap: 10, padding: '18px 20px 10px', flexShrink: 0 },
+  title: { fontSize: '1.5rem', fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.02em' },
   badge: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 6,
-    background: 'rgba(201,168,76,0.1)',
-    border: '1px solid var(--border)',
-    borderRadius: 20,
-    padding: '6px 14px',
+    background: 'var(--rose)', color: '#fff',
+    borderRadius: 20, padding: '2px 10px',
+    fontSize: '0.78rem', fontWeight: 700,
   },
-  badgeText: { color: 'var(--gold)', fontSize: '0.85rem', fontWeight: 700 },
-  list: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 14,
-    overflowY: 'auto',
-    paddingBottom: 24,
-  },
+  center: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  list: { flex: 1, overflowY: 'auto', padding: '4px 16px 16px', display: 'flex', flexDirection: 'column', gap: 12 },
   card: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 16,
-    background: 'var(--navy-mid)',
+    display: 'flex', alignItems: 'center', gap: 14,
+    background: 'var(--surface)', borderRadius: 'var(--radius)',
+    padding: '14px 16px', boxShadow: 'var(--shadow)',
     border: '1px solid var(--border)',
-    borderRadius: 20,
-    padding: '16px 20px',
-    position: 'relative',
-    overflow: 'hidden',
-    flexShrink: 0,
   },
-  cardAccent: {
-    position: 'absolute',
-    top: 0, left: '15%', right: '15%',
-    height: 1,
-    background: 'linear-gradient(90deg, transparent, var(--gold), transparent)',
-  },
-  avatarWrap: {
-    position: 'relative',
-    width: 64,
-    height: 64,
-    flexShrink: 0,
-  },
-  avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: '50%',
-    objectFit: 'cover',
-    border: '2px solid var(--gold)',
-  },
-  avatarRing: {
-    position: 'absolute',
-    inset: -4,
-    borderRadius: '50%',
-    border: '1px solid rgba(201,168,76,0.25)',
-    pointerEvents: 'none',
-  },
-  heartBadge: {
-    position: 'absolute',
-    bottom: -2,
-    right: -2,
-    fontSize: '1rem',
-    background: 'var(--navy-mid)',
-    borderRadius: '50%',
-    width: 22,
-    height: 22,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    border: '1px solid var(--border)',
+  photoWrap: { position: 'relative', flexShrink: 0 },
+  photo: { width: 62, height: 62, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--rose-light)' },
+  onlineDot: {
+    position: 'absolute', bottom: 2, right: 2,
+    width: 12, height: 12, borderRadius: '50%',
+    background: 'var(--green)', border: '2px solid var(--surface)',
   },
   info: { flex: 1, minWidth: 0 },
-  nameRow: { display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 3 },
-  name: {
-    fontFamily: 'Cormorant Garamond, serif',
-    fontSize: '1.25rem',
-    fontWeight: 600,
-    color: 'var(--cream)',
-  },
-  age: { color: 'var(--text-muted)', fontSize: '0.8rem' },
-  cityRow: { display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6 },
-  city: { color: 'var(--text-muted)', fontSize: '0.75rem' },
-  bio: {
-    color: 'var(--cream)',
-    fontSize: '0.8rem',
-    opacity: 0.7,
-    marginBottom: 8,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  tags: { display: 'flex', gap: 6, flexWrap: 'wrap' },
-  tag: {
-    background: 'rgba(201,168,76,0.1)',
-    border: '1px solid rgba(201,168,76,0.2)',
-    color: 'var(--gold-light)',
-    borderRadius: 20,
-    padding: '2px 10px',
-    fontSize: '0.68rem',
-    fontWeight: 500,
-  },
-  matchedLabel: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 3,
-    color: 'var(--gold)',
-    fontSize: '0.62rem',
-    fontWeight: 600,
-    letterSpacing: '0.08em',
-    textTransform: 'uppercase',
-    flexShrink: 0,
-  },
-  center: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  spinner: {
-    width: 36,
-    height: 36,
-    borderRadius: '50%',
-    border: '3px solid var(--border)',
-    borderTopColor: 'var(--gold)',
-  },
+  nameRow: { marginBottom: 2 },
+  name: { fontSize: '1rem', fontWeight: 700, color: 'var(--text)' },
+  cityRow: { display: 'flex', alignItems: 'center', gap: 4, marginBottom: 5 },
+  city: { fontSize: '0.75rem', color: 'var(--text-3)' },
+  bio: { fontSize: '0.8rem', color: 'var(--text-2)', marginBottom: 7, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+  tags: { display: 'flex', gap: 6 },
+  tag: { background: 'var(--rose-light)', color: 'var(--rose-dark)', borderRadius: 20, padding: '2px 10px', fontSize: '0.68rem', fontWeight: 500 },
+  msgBtn: { background: 'var(--rose-light)', border: 'none', borderRadius: '50%', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
 }

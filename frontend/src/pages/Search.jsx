@@ -6,63 +6,51 @@ export default function Search() {
   const [profiles, setProfiles] = useState([])
   const [query, setQuery] = useState('')
 
-  useEffect(() => {
-    fetch('/api/feed').then(r => r.json()).then(setProfiles)
-  }, [])
+  useEffect(() => { fetch('/api/feed').then(r => r.json()).then(setProfiles) }, [])
 
   const filtered = profiles.filter(p =>
-    p.name.toLowerCase().includes(query.toLowerCase()) ||
-    p.city.toLowerCase().includes(query.toLowerCase()) ||
-    p.interests.toLowerCase().includes(query.toLowerCase())
+    [p.name, p.city, p.interests].some(f => f.toLowerCase().includes(query.toLowerCase()))
   )
 
   return (
-    <div style={styles.root}>
-      <div style={styles.header}>
-        <h1 style={styles.title}>Explore</h1>
-        <p style={styles.subtitle}>Browse all profiles</p>
-      </div>
-
+    <div style={s.root}>
       {/* Search bar */}
-      <div style={styles.searchWrap}>
-        <SearchIcon size={16} color="var(--text-muted)" style={{ flexShrink: 0 }} />
+      <div style={s.searchBar}>
+        <SearchIcon size={16} color="var(--text-3)" />
         <input
-          style={styles.input}
+          style={s.input}
           placeholder="Search by name, city or interest..."
           value={query}
           onChange={e => setQuery(e.target.value)}
         />
       </div>
 
-      {/* Count */}
-      <p style={styles.count}>{filtered.length} profiles</p>
+      <p style={s.count}>{filtered.length} people nearby</p>
 
-      {/* Grid */}
-      <div style={styles.grid}>
+      <div style={s.grid}>
         {filtered.map((p, i) => (
           <motion.div
             key={p.id}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.03 }}
-            style={styles.card}
+            transition={{ delay: i * 0.025 }}
+            style={s.card}
           >
-            <div style={styles.imgWrap}>
-              <img src={p.photo} alt={p.name} style={styles.img} />
-              <div style={styles.imgOverlay} />
+            <div style={s.imgWrap}>
+              <img src={p.photo} alt={p.name} style={s.img} />
+              <div style={s.imgGrad} />
+              <div style={s.cardOverlay}>
+                <span style={s.cardName}>{p.name}, {p.age}</span>
+                <div style={s.cardCity}>
+                  <MapPin size={10} color="rgba(255,255,255,0.8)" />
+                  <span>{p.city}</span>
+                </div>
+              </div>
             </div>
-            <div style={styles.info}>
-              <div style={styles.nameRow}>
-                <span style={styles.name}>{p.name}</span>
-                <span style={styles.age}>{p.age}</span>
-              </div>
-              <div style={styles.cityRow}>
-                <MapPin size={11} color="var(--gold)" />
-                <span style={styles.city}>{p.city}</span>
-              </div>
-              <div style={styles.tags}>
+            <div style={s.cardBody}>
+              <div style={s.cardTags}>
                 {p.interests.split(',').slice(0, 2).map(t => (
-                  <span key={t} style={styles.tag}>{t.trim()}</span>
+                  <span key={t} style={s.tag}>{t.trim()}</span>
                 ))}
               </div>
             </div>
@@ -73,89 +61,30 @@ export default function Search() {
   )
 }
 
-const styles = {
-  root: {
-    height: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '28px 32px 0',
-    background: 'var(--navy)',
-    overflow: 'hidden',
+const s = {
+  root: { height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', overflow: 'hidden' },
+  searchBar: {
+    display: 'flex', alignItems: 'center', gap: 10,
+    margin: '14px 16px 0',
+    background: 'var(--surface)', border: '1px solid var(--border)',
+    borderRadius: 14, padding: '11px 14px', flexShrink: 0,
+    boxShadow: 'var(--shadow)',
   },
-  header: { marginBottom: 20, flexShrink: 0 },
-  title: {
-    fontFamily: 'Cormorant Garamond, serif',
-    fontSize: '2.4rem',
-    fontWeight: 600,
-    color: 'var(--cream)',
-    lineHeight: 1,
-  },
-  subtitle: { color: 'var(--text-muted)', fontSize: '0.82rem', marginTop: 4, letterSpacing: '0.05em' },
-  searchWrap: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 10,
-    background: 'var(--navy-mid)',
-    border: '1px solid var(--border)',
-    borderRadius: 14,
-    padding: '12px 16px',
-    marginBottom: 16,
-    flexShrink: 0,
-  },
-  input: {
-    flex: 1,
-    background: 'transparent',
-    border: 'none',
-    outline: 'none',
-    color: 'var(--cream)',
-    fontSize: '0.88rem',
-    fontFamily: 'Montserrat, sans-serif',
-  },
-  count: {
-    color: 'var(--text-muted)',
-    fontSize: '0.75rem',
-    letterSpacing: '0.08em',
-    textTransform: 'uppercase',
-    marginBottom: 16,
-    flexShrink: 0,
-  },
+  input: { flex: 1, background: 'none', border: 'none', outline: 'none', fontSize: '0.9rem', color: 'var(--text)' },
+  count: { padding: '10px 16px 6px', fontSize: '0.75rem', color: 'var(--text-3)', fontWeight: 500, flexShrink: 0 },
   grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
-    gap: 14,
-    overflowY: 'auto',
-    paddingBottom: 24,
+    display: 'grid', gridTemplateColumns: '1fr 1fr',
+    gap: 12, padding: '0 16px 16px',
+    overflowY: 'auto', flex: 1,
   },
-  card: {
-    background: 'var(--card-bg)',
-    borderRadius: 16,
-    overflow: 'hidden',
-    border: '1px solid var(--border)',
-    transition: 'transform 0.2s',
-    cursor: 'pointer',
-  },
-  imgWrap: { position: 'relative', height: 160 },
+  card: { background: 'var(--surface)', borderRadius: 'var(--radius)', overflow: 'hidden', boxShadow: 'var(--shadow)' },
+  imgWrap: { position: 'relative', height: 180 },
   img: { width: '100%', height: '100%', objectFit: 'cover', display: 'block' },
-  imgOverlay: {
-    position: 'absolute',
-    bottom: 0, left: 0, right: 0,
-    height: '40%',
-    background: 'linear-gradient(to top, rgba(10,18,28,0.9), transparent)',
-  },
-  info: { padding: '10px 12px 12px' },
-  nameRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 3 },
-  name: { fontFamily: 'Cormorant Garamond, serif', fontSize: '1.05rem', fontWeight: 600, color: 'var(--cream)' },
-  age: { color: 'var(--text-muted)', fontSize: '0.78rem' },
-  cityRow: { display: 'flex', alignItems: 'center', gap: 4, marginBottom: 8 },
-  city: { color: 'var(--text-muted)', fontSize: '0.72rem' },
-  tags: { display: 'flex', gap: 5, flexWrap: 'wrap' },
-  tag: {
-    background: 'rgba(201,168,76,0.1)',
-    border: '1px solid rgba(201,168,76,0.2)',
-    color: 'var(--gold-light)',
-    borderRadius: 20,
-    padding: '2px 8px',
-    fontSize: '0.65rem',
-    fontWeight: 500,
-  },
+  imgGrad: { position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 55%)' },
+  cardOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: '10px 12px' },
+  cardName: { display: 'block', fontSize: '0.95rem', fontWeight: 700, color: '#fff', marginBottom: 2 },
+  cardCity: { display: 'flex', alignItems: 'center', gap: 3, color: 'rgba(255,255,255,0.8)', fontSize: '0.72rem' },
+  cardBody: { padding: '10px 12px 12px' },
+  cardTags: { display: 'flex', gap: 6, flexWrap: 'wrap' },
+  tag: { background: 'var(--rose-light)', color: 'var(--rose-dark)', borderRadius: 20, padding: '3px 10px', fontSize: '0.7rem', fontWeight: 500 },
 }
